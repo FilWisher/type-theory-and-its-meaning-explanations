@@ -9,7 +9,6 @@
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
 \usepackage{stmaryrd}
 \usepackage{mathtools}
-\usepackage{subfiles}
 
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{prop}[thm]{Proposition}
@@ -102,9 +101,6 @@ and Darin Morrison for invaluable conversations which helped sharpen my view of
 the meaning explanations for computational and intensional type theories. All
 mistakes are mine.}
 
-% \address{AlephCloud Systems}
-% \email{jon@jonmsterling.com}
-
 \maketitle
 
 \begin{abstract}
@@ -121,9 +117,9 @@ mistakes are mine.}
 
 \tableofcontents
 
-\subfile{logicaltheory}
-\subfile{ctt}
-\subfile{prooftheory}
+\include{logicaltheory}
+\include{ctt}
+\include{prooftheory}
 
 
 \bibliographystyle{plain}
