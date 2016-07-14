@@ -6,7 +6,7 @@
 \usepackage{proof}
 \usepackage{setspace}
 \usepackage{booktabs}
-\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage[dvipsnames]{xcolor}
 \usepackage{stmaryrd}
 \usepackage{mathtools}
 
@@ -38,10 +38,13 @@
 \newcommand\ahyp[2]{\ensuremath{#1 & (#2)}}
 \newcommand\genj[2]{\ensuremath{\lvert_{\InputMode{#1}}\,#2}}
 \newcommand\ver[2]{\ensuremath{\InputMode{#1}\in\InputMode{#2}}}
+\newcommand\isenv[2]{\ensuremath{\InputMode{#1}\in^\star\InputMode{#2}}}
+\newcommand\eqenv[3]{\ensuremath{\InputMode{#1}=\InputMode{#2}\in^\star\InputMode{#3}}}
 \newcommand\ever[3]{\ensuremath{\InputMode{#1}=\InputMode{#2}\in\InputMode{#3}}}
 \newcommand\ofty[2]{\ensuremath{\InputMode{#1}:\InputMode{#2}}}
 \newcommand\eofty[3]{\ensuremath{\InputMode{#1}=\InputMode{#2}:\InputMode{#3}}}
 \newcommand\reduce[2]{\ensuremath{\InputMode{#1}\Downarrow\OutputMode{#2}}}
+\newcommand\Match[2]{\ensuremath{\InputMode{#1}\equiv\OutputMode{#2}}}
 \newcommand\areduce[2]{\ensuremath{\InputMode{#1}&\Downarrow\OutputMode{#2}}}
 \newcommand\naturals{\ensuremath{\mathbb{N}}}
 \newcommand\suc[1]{\ensuremath{\mathsf{S}(#1)}}

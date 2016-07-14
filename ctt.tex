@@ -100,26 +100,20 @@ Computational Type Theory and Nuprl, it was written
 confusion with a similar judgement form which appears in proof-theoretic,
 intensional type theories; we'll call the judgement form a ``(functional) sequent''.
 
-First, we will add the syntax of contexts into the computation system:
-\begin{gather*}
-  \reduce{\cdot}{\cdot}\tag{Canonical}\\
-  \reduce{(\Gamma,x:A)}{(\Gamma,x:A)}
-\end{gather*}
 
-The sequent judgements will be defined simultaneously with two other
-judgements, \framebox{$\isctx{\Gamma}$} (``$\Gamma$ is a context'')
-and \framebox{$\fresh{x}{\Gamma}$} (``$x$ is fresh in
-$\Gamma$''). Their meaning explanations are as follows:
+We will define several forms of judgment simultaneously with the sequent judgments:
+\framebox{$\isctx{\Gamma}$} (``$\Gamma$ is a context''),
+\framebox{$\fresh{x}{\Gamma}$} (``$x$ is fresh in $\Gamma$'').
 
 \begin{quote}
-  To know $\isctx\Gamma$\ is to know that $\reduce{\Gamma}{\cdot}$, or it is to know
-  a variable $x$ and expressions $\Delta,A$ such that $\reduce{\Gamma}{\Delta, x:A}$
+  To know $\isctx\Gamma$\ is to know that $\Match{\Gamma}{\cdot}$, or it is to know
+  a variable $x$ and expressions $\Delta,A$ such that $\Match{\Gamma}{\Delta, x:A}$
   and $\sequent{\Delta}{\isset{A}}$, and $\fresh{x}{\Delta}$.
 \end{quote}
 
 \begin{quote}
   To know $\fresh{x}{\Gamma}$\ (presupposing $\isctx\Gamma$) is to know that
-  $\reduce{\Gamma}{\cdot}$, or, if $\reduce{\Gamma}{\Delta,y:A}$
+  $\Match{\Gamma}{\cdot}$, or, if $\Match{\Gamma}{\Delta,y:A}$
   such that $x$ is not $y$ and $\fresh{x}{\Delta}$.
 \end{quote}
 
@@ -144,57 +138,83 @@ following grammar:
   }
 \end{gather*}
 
+Next, we define the notion of an \emph{environment} or \emph{substitution} for
+a context, $\framebox{\isenv{\rho}{\Gamma}}$. It is possible to define this
+more generally as functional maps from one context to another, but for our
+purposes, this is the only case we need.
+\begin{quote}
+  To know $\isenv{\rho}{\Gamma}$, presupposing $\isctx{\Gamma}$, is to know, if
+  $\Match{\Gamma}{\cdot}$, then $\Match{\rho}{\cdot}$; otherwise, if
+  $\Match{\Gamma}{\Delta, x:A}$ then $\Match{\rho}{\rho', M}$ such that
+  $\isenv{\rho'}{\Delta}$ and $\ver{[\rho'/\Delta]M}{[\rho'/\Delta]A}$. The substitution
+  $[\rho/\Gamma]$ is effected by replacing each variable in $\Gamma$ with the
+  corresponding term in $\rho$.
+\end{quote}
+
+We will also specify when two environments are equal,
+$\framebox{\eqenv{\rho_0}{\rho_1}{\Gamma}}$:
+\begin{quote}
+  To know $\eqenv{\rho_0}{\rho_1}{\Gamma}$, presupposing $\isctx{\Gamma}$,
+  $\isenv{\rho_0}{\Gamma}$ and $\isenv{\rho_1}{\Gamma}$ is to know, if
+  $\Match{\Gamma}{\cdot}$, then $\Match{\rho_0}{\cdot}$ and
+  $\Match{\rho_1}{\cdot}$; otherwise, if $\Match{\Gamma}{\Delta,x:A}$ and
+  thence $\Match{\rho_0}{\rho_0',M_0}$ and $\Match{\rho_1}{\rho_1',M_1}$, then
+  $\eqenv{\rho_0'}{\rho_1'}{\Delta}$ and
+  $\ever{[\rho_0/\Delta]M_0}{[\rho_1/\Delta]M_1}{[\rho_0/\Delta]A}$.
+\end{quote}
+
 We will say that $\sequent{\Gamma}{\mathcal{J}}$ is only a judgement under the
 presuppositions that $\isctx\Gamma$\ and that $\mathcal{J}$ is a categorical
 judgement of the form $\isset{A}$, $\eisset{A}{B}$, $\ver{M}{A}$, or
-$\ever{M}{N}{A}$. Because of this presupposition, we are justified in
-propounding the meaning of the judgement by structural induction on the
-evidence for $\isctx\Gamma$, separately for each $\mathcal{J}$.
-
-Now we may begin giving the meaning explanations for
-$\sequent{\Gamma}{\mathcal{J}}$, starting with typehood with respect to a context:
+$\ever{M}{N}{A}$.  Now we may begin giving the meaning explanations for
+$\sequent{\Gamma}{\mathcal{J}}$, starting with typehood with respect to a
+context:
 
 \begin{quote}
-
-  To know $\sequent{\Gamma}{\isset{A}}$ (presupposing $\isctx\Gamma$) is to
-know, if $\reduce{\Gamma}{\cdot}$, then $\isset{A}$; otherwise, if
-$\reduce{\Gamma}{\Delta,x:B}$, that
-$\genj{M}{\hyp{\sequent{\Delta}{[M/x]\isset{A}}}{\sequent{\Delta}{M:B}}}$ and
-moreover
-$\genj{M,N}{\hyp{\sequent{\Delta}{\eisset{[M/x]A}{[N/x]A}}}{\sequent{\Delta}{\ever{M}{N}{B}}}}$.
-
+  To know $\sequent{\Gamma}{\isset{A}}$ (presupposing $\isctx\Gamma$) to know
+  $
+    \genj{\rho}{
+      \hyp{
+        \isset{[\rho/\Gamma]A}
+      }{
+        \isenv{\rho}{\Gamma}
+      }
+    }
+  $
+  and moreover, to know
+  $
+    \genj{\rho_0,\rho_1}{
+      \hyp{
+        \eisset{[\rho_0/\Gamma]A}{[\rho_1/\Gamma]A}
+      }{
+        \eqenv{\rho_0}{\rho_1}{\Gamma}
+      }
+    }
+  $.
 \end{quote}
 
-In this way, we have defined the sequent judgement by structural induction on
-the evidence for the presupposition $\isctx\Gamma$. We can explain type
-equality sequents in a similar way:
+We can explain type equality sequents in a similar way:
 
 \begin{quote}
-  To know $\sequent{\Gamma}{\eisset{A}{B}}$ (presupposing $\isctx\Gamma$, $\sequent{\Gamma}{\isset{A}}$, $\sequent{\Gamma}{\isset{B}}$) is to know, if $\reduce{\Gamma}{\cdot}$, that $\eisset{A}{B}$; otherwise, if $\reduce{\Gamma}{\Delta,x:C}$, it is to know
+
+  To know $\sequent{\Gamma}{\eisset{A}{B}}$ (presupposing $\isctx\Gamma$,
+  $\sequent{\Gamma}{\isset{A}}$, $\sequent{\Gamma}{\isset{B}}$) is to know
   \[
-    \genj{M}{
+    \genj{\rho}{
       \hyp{
-        \sequent{\Delta}{
-          \eisset{[M/x]A}{[M/x]B}
-        }
+        \eisset{[\rho/\Gamma]A}{[\rho/\Gamma]B}
       }{
-        \sequent{\Delta}{
-          \ver{M}{C}
-        }
+        \isenv{\rho}{\Gamma}
       }
     }
   \]
   and moreover, to know
   \[
-    \genj{M,N}{
+    \genj{\rho_0,\rho_1}{
       \hyp{
-        \sequent{\Delta}{
-          \eisset{[M/x]A}{[N/x]B}
-        }
+        \eisset{[\rho_0/\Gamma]A}{[\rho_1/\Gamma]B}
       }{
-        \sequent{\Delta}{
-          \ever{M}{N}{C}
-        }
+        \eqenv{\rho_0}{\rho_1}{\Gamma}
       }
     }
   \]
@@ -203,33 +223,23 @@ equality sequents in a similar way:
 Next, the meaning of membership sequents is explained:
 
 \begin{quote}
-  To know $\sequent{\Gamma}{\ver{M}{A}}$ (presupposing $\isctx\Gamma$, $\sequent{\Gamma}{\isset{A}}$) is to know, if
-  $\reduce\Gamma\cdot$, that $\ver{M}{A}$; otherwise, if
-  $\reduce{\Gamma}{\Delta,x:B}$, it is to know
-  \[
-    \genj{N}{
+  To know $\sequent{\Gamma}{\ver{M}{A}}$ (presupposing $\isctx\Gamma$, $\sequent{\Gamma}{\isset{A}}$) is to know
+  $
+    \genj{\rho}{
       \hyp{
-        \sequent{\Delta}{
-          \ver{[N/x]M}{[N/x]A}
-        }
+        \ver{[\rho/\Gamma]M}{[\rho/\Gamma]A}
       }{
-        \sequent{\Delta}{
-          \ver{N}{B}
-        }
+        \isenv{\rho}{\Gamma}
       }
     }
-  \]
+  $
   and moreover, to know
   \[
-    \genj{L,N}{
+    \genj{\rho_0,\rho_1}{
       \hyp{
-        \sequent{\Delta}{
-          \ever{[L/x]M}{[N/x]M}{A}
-        }
+        \ever{[\rho_0/\Gamma]M}{[\rho_1/\Gamma]M}{[\rho_0/\Gamma]A}
       }{
-        \sequent{\Delta}{
-          \ever{L}{N}{B}
-        }
+        \eqenv{\rho_0}{\rho_1}{\Gamma}
       }
     }
   \]
@@ -238,33 +248,23 @@ Next, the meaning of membership sequents is explained:
 Finally, member equality sequents have an analogous explanation:
 
 \begin{quote}
-  To know $\sequent{\Gamma}{\ever{M}{M'}{A}}$ (presupposing $\isctx\Gamma$, $\sequent{\Gamma}{\isset{A}}$) is to know, if
-  $\reduce{\Gamma}{\cdot}$, that $\ever{M}{M'}{A}$; otherwise, if
-  $\reduce{\Gamma}{\Delta,x:B}$, it is to know
-  \[
-    \genj{N}{
+  To know $\sequent{\Gamma}{\ever{M}{M'}{A}}$ (presupposing $\isctx\Gamma$, $\sequent{\Gamma}{\isset{A}}$) is to know
+  $
+    \genj{\rho}{
       \hyp{
-        \sequent{\Delta}{
-          \ever{[N/x]M}{[N/x]M'}{A}
-        }
+        \ever{[\rho/\Gamma]M}{[\rho/\Gamma]N}{[\rho/\Gamma]A}
       }{
-        \sequent{\Delta}{
-          \ver{N}{B}
-        }
+        \isenv{\rho}{\Gamma}
       }
     }
-  \]
+  $
   and moreover, to know
   \[
-    \genj{L,N}{
+    \genj{\rho_0,\rho_1}{
       \hyp{
-        \sequent{\Delta}{
-          \ever{[L/x]M}{[N/x]M'}{A}
-        }
+        \ever{[\rho_0/\Gamma]M}{[\rho_1/\Gamma]N}{[\rho_0/\Gamma]A}
       }{
-        \sequent{\Delta}{
-          \ever{L}{N}{B}
-        }
+        \eqenv{\rho_0}{\rho_1}{\Gamma}
       }
     }
   \]
@@ -487,15 +487,15 @@ empty context, the rule amounts to the assertion
   }
 \]
 
-By the meaning explanation for hypothetical judgement, and the
-definition of the family cartesian product type, we know that
-$\reduce{M}{\lam{x}{E}}$ for some $E$ such that we know
-$\sequent{x:A}{\ver{E}{B}}$; from the meaning of the sequent
-judgement, we can conclude $\genj{L}{\hyp{\ver{[L/x]E}{[L/x]B}}{L\in
-A}}$. On the other hand, from the computation rules, we know that if
-for some particular $E'$, $\reduce{[N/x]E}{E'}$, then we know
-$\reduce{\ap{\lam{x}{E}}{N}}{E'}$; to demonstrate the evidence of the
-premise, we may instantiate $L$ at $N$ to know $\ver{[N/x]E}{[N/x]B}$,
-whence by the meaning of membership, we know that there exists some
-canonical $E'$ such that $\reduce{[N/x]}{E'}$.
+By the meaning explanation for hypothetical judgement, and the definition of
+the family cartesian product type, we know that $\reduce{M}{\lam{x}{E}}$ for
+some $E$ such that we know $\sequent{x:A}{\ver{E}{B}}$; from the meaning of the
+sequent judgement and the notion of an environment for a context, we can
+conclude $\genj{L}{\hyp{\ver{[L/x]E}{[L/x]B}}{L\in A}}$. On the other hand,
+from the computation rules, we know that if for some particular $E'$,
+$\reduce{[N/x]E}{E'}$, then we know $\reduce{\ap{\lam{x}{E}}{N}}{E'}$; to
+demonstrate the evidence of the premise, we may instantiate $L$ at $N$ to know
+$\ver{[N/x]E}{[N/x]B}$, whence by the meaning of membership, we know that there
+exists some canonical $E'$ such that $\reduce{[N/x]}{E'}$.
+
 \end{proof}
